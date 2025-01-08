@@ -1,2 +1,5 @@
 node_modules/
 .vscode
+chatbot
+.env
+__pycache__
