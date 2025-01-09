@@ -14,7 +14,6 @@ CORS(app)
 
 load_dotenv()
 
-
 key = os.getenv("KEY_API")
 genai.configure(api_key=key)
 
