@@ -1266,7 +1266,7 @@ body {
 
 body {
   font-family: "Nunito", sans-serif;
-  font-weight: 400;
+  font-weight: 300;
   font-size: 100%;
   background: #f1f1f1;
 }
@@ -1293,10 +1293,13 @@ html {
   flex-direction: column;
   background: #000957;
   width: 300px;
-  height: 350px;
+  height: 400px;
   z-index: -123456;
   opacity: 0;
   transition: all 0.5s ease-in-out;
+  position: fixed; /* Ensure the chatbox is fixed to the viewport */
+  bottom: 70px; /* Adjust this value to move the chatbox up or down */
+  right: 20px; /* Adjust this value to move the chatbox left or right */
 }
 
 /* CONTENT ISOPEN */
@@ -1356,7 +1359,7 @@ html {
 
 .chatbox__support {
   background: #f9f9f9;
-  height: 450px;
+  height: 550px;
   width: 340px;
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
   border-top-left-radius: 20px;
@@ -1372,23 +1375,25 @@ html {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 15px 20px;
+  padding: 1px 20px;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   box-shadow: var(--primaryBoxShadow);
 }
 
 .chatbox__image--header {
-  margin-right: 10px;
+  margin-right: 25px;
+  width: 70px;
+  height: 70px;
 }
 
 .chatbox__heading--header {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: white;
 }
 
 .chatbox__description--header {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: white;
 }
 
@@ -1425,12 +1430,12 @@ html {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 20px;
+  padding: 15px 20px;
   background: var(--secondaryGradient);
   box-shadow: var(--secondaryBoxShadow);
   border-bottom-right-radius: 20px;
   border-bottom-left-radius: 20px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .chatbox__footer input {
@@ -1460,6 +1465,6 @@ html {
 }
 
 .chatbox__button img {
-  width: 70px; /* Adjust the width as needed */
-  height: 70px; /* Adjust the height as needed */
+  width: 40px; /* Adjust the width as needed */
+  height: 40px; /* Adjust the height as needed */
 }
