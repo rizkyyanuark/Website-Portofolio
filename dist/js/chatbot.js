@@ -31,17 +31,8 @@ class Chatbox {
     // show or hides the box
     if (this.state) {
       chatbox.classList.add("chatbox--active");
-      this.sendWelcomeMessage(chatbox);
     } else {
       chatbox.classList.remove("chatbox--active");
-    }
-  }
-
-  sendWelcomeMessage(chatbox) {
-    if (this.messages.length === 0) {
-      let msg = { name: "airi", message: "Hi. My name is airi. How can I help you?" };
-      this.messages.push(msg);
-      this.updateChatText(chatbox);
     }
   }
 
@@ -54,12 +45,6 @@ class Chatbox {
 
     let msg1 = { name: "User", message: text1 };
     this.messages.push(msg1);
-    this.updateChatText(chatbox);
-
-    // Add a "thinking" message
-    let thinkingMsg = { name: "airi", message: "Thinking..." };
-    this.messages.push(thinkingMsg);
-    this.updateChatText(chatbox);
 
     fetch("https://nv-bite-api-279551392308.asia-southeast1.run.app/chatbot", {
       method: "POST",
@@ -69,12 +54,9 @@ class Chatbox {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => response.json())
-      .then((data) => {
-        // Remove the "thinking" message
-        this.messages.pop();
-
-        let msg2 = { name: "airi", message: data.answer };
+      .then((r) => r.json())
+      .then((r) => {
+        let msg2 = { name: "Sam", message: r.answer };
         this.messages.push(msg2);
         this.updateChatText(chatbox);
         textField.value = "";
@@ -92,7 +74,7 @@ class Chatbox {
       .slice()
       .reverse()
       .forEach(function (item, index) {
-        if (item.name === "airi") {
+        if (item.name === "Sam") {
           html += '<div class="messages__item messages__item--visitor">' + item.message + "</div>";
         } else {
           html += '<div class="messages__item messages__item--operator">' + item.message + "</div>";
