@@ -1,0 +1,6 @@
+dist
+src
+indexhtml
+package.json
+package-lock.json
+tailwind.config.js
