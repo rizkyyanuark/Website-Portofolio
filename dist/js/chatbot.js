@@ -61,7 +61,7 @@ class Chatbox {
     this.messages.push(thinkingMsg);
     this.updateChatText(chatbox);
 
-    fetch("/predict", {
+    fetch("/api/chatbot", {
       method: "POST",
       body: JSON.stringify({ message: text1 }),
       mode: "cors",
@@ -69,12 +69,12 @@ class Chatbox {
         "Content-Type": "application/json",
       },
     })
-      .then((r) => r.json())
-      .then((r) => {
+      .then((response) => response.json())
+      .then((data) => {
         // Remove the "thinking" message
         this.messages.pop();
 
-        let msg2 = { name: "airi", message: r.data.GenText };
+        let msg2 = { name: "airi", message: data.answer };
         this.messages.push(msg2);
         this.updateChatText(chatbox);
         textField.value = "";
