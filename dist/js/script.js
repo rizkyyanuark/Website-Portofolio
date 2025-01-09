@@ -52,6 +52,9 @@ class Chatbox {
       return;
     }
 
+    // Clear the input field immediately
+    textField.value = "";
+
     let msg1 = { name: "User", message: text1 };
     this.messages.push(msg1);
     this.updateChatText(chatbox);
@@ -61,7 +64,7 @@ class Chatbox {
     this.messages.push(thinkingMsg);
     this.updateChatText(chatbox);
 
-    fetch("http://127.0.0.1:5000/predict", {
+    fetch("https://nv-bite-api-279551392308.asia-southeast1.run.app/chatbot", {
       method: "POST",
       body: JSON.stringify({ message: text1 }),
       mode: "cors",
@@ -77,12 +80,10 @@ class Chatbox {
         let msg2 = { name: "airi", message: data.answer };
         this.messages.push(msg2);
         this.updateChatText(chatbox);
-        textField.value = "";
       })
       .catch((error) => {
         console.error("Error:", error);
         this.updateChatText(chatbox);
-        textField.value = "";
       });
   }
 
