@@ -1,13 +1,9 @@
 import os
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-from google.cloud import secretmanager
-import json
 from dotenv import load_dotenv
-from vertexai.generative_models import GenerativeModel, Part, SafetySetting
 import google.generativeai as genai
 import re
-import markdown
 
 app = Flask(__name__)
 CORS(app)
