@@ -61,7 +61,7 @@ class Chatbox {
     this.messages.push(thinkingMsg);
     this.updateChatText(chatbox);
 
-    fetch("/api/chatbot", {
+    fetch("https://nv-bite-api-279551392308.asia-southeast1.run.app/chatbot", {
       method: "POST",
       body: JSON.stringify({ message: text1 }),
       mode: "cors",
