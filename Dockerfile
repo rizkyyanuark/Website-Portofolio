@@ -1,23 +1,17 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.9-slim
+# Gunakan image dasar yang sesuai
+FROM python:3.10-slim
 
-# Set the working directory in the container
-WORKDIR /app
+ENV PYTHONUNBUFFERED True
+ENV APP_HOME /app
 
-# Copy the requirements file into the container
-COPY requirements.txt requirements.txt
+# Set working directory
+WORKDIR $APP_HOME
 
-# Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Salin seluruh kode aplikasi ke dalam container
+COPY . ./
 
-# Copy the rest of the application code into the container
-COPY app.py app.py
+# Salin requirements.txt dan install dependencies
+RUN pip install -r requirements.txt
 
-# Set the environment variable for Flask
-ENV FLASK_APP=app.py
-
-# Expose the port that the app runs on
-EXPOSE 8080
-
-# Run the application
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+# Jalankan aplikasi menggunakan gunicorn
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
