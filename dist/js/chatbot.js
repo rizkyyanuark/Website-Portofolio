@@ -31,8 +31,17 @@ class Chatbox {
     // show or hides the box
     if (this.state) {
       chatbox.classList.add("chatbox--active");
+      this.sendWelcomeMessage(chatbox);
     } else {
       chatbox.classList.remove("chatbox--active");
+    }
+  }
+
+  sendWelcomeMessage(chatbox) {
+    if (this.messages.length === 0) {
+      let msg = { name: "airi", message: "Hi. My name is airi. How can I help you?" };
+      this.messages.push(msg);
+      this.updateChatText(chatbox);
     }
   }
 
@@ -45,8 +54,14 @@ class Chatbox {
 
     let msg1 = { name: "User", message: text1 };
     this.messages.push(msg1);
+    this.updateChatText(chatbox);
 
-    fetch("http://127.0.0.1:5000/predict", {
+    // Add a "thinking" message
+    let thinkingMsg = { name: "airi", message: "Thinking..." };
+    this.messages.push(thinkingMsg);
+    this.updateChatText(chatbox);
+
+    fetch("/predict", {
       method: "POST",
       body: JSON.stringify({ message: text1 }),
       mode: "cors",
@@ -56,7 +71,10 @@ class Chatbox {
     })
       .then((r) => r.json())
       .then((r) => {
-        let msg2 = { name: "Sam", message: r.answer };
+        // Remove the "thinking" message
+        this.messages.pop();
+
+        let msg2 = { name: "airi", message: r.data.GenText };
         this.messages.push(msg2);
         this.updateChatText(chatbox);
         textField.value = "";
@@ -74,7 +92,7 @@ class Chatbox {
       .slice()
       .reverse()
       .forEach(function (item, index) {
-        if (item.name === "Sam") {
+        if (item.name === "airi") {
           html += '<div class="messages__item messages__item--visitor">' + item.message + "</div>";
         } else {
           html += '<div class="messages__item messages__item--operator">' + item.message + "</div>";
