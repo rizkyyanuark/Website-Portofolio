@@ -1,6 +1,6 @@
-dist
-src
-indexhtml
+dist/
+src/
+index.html
 package.json
 package-lock.json
 tailwind.config.js
