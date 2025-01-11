@@ -1443,8 +1443,8 @@ html {
 .chatbox__footer input {
   width: 80%;
   border: none;
-  padding: 10px 10px;
-  border-radius: 30px;
+  padding: 7px 7px;
+  border-radius: 50px;
   text-align: left;
 }
 

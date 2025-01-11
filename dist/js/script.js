@@ -40,7 +40,10 @@ class Chatbox {
 
   sendWelcomeMessage(chatbox) {
     if (this.messages.length === 0) {
-      let msg = { name: "airi", message: "Hi. My name is airi. How can I help you?" };
+      let msg = {
+        name: "airi",
+        message: "Hi, I’m Airi, Rizky Yanuar’s assistant! Ask me anything about Rizky, I’m here to help! 😊",
+      };
       this.messages.push(msg);
       this.updateChatText(chatbox);
     }
