@@ -1403,10 +1403,10 @@ html {
 }
 
 .messages__item {
+  font-size: 13px; /* Atur ukuran font sesuai kebutuhan */
   margin-top: 10px;
   background: #e0e0e0;
   padding: 8px 12px;
-  max-width: 70%;
 }
 
 .messages__item--visitor,
@@ -1414,6 +1414,7 @@ html {
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
+  max-width: 80%;
 }
 
 .messages__item--operator {
@@ -1422,6 +1423,7 @@ html {
   border-bottom-left-radius: 20px;
   background: var(--primary);
   color: white;
+  max-width: 70%;
 }
 
 /* FOOTER */

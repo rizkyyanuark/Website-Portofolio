@@ -9,7 +9,7 @@ const port = 3000;
 
 app.use(express.json());
 
-app.post("/api/chatbot", async (req, res) => {
+app.post("/js/chat", async (req, res) => {
   const { message } = req.body;
   try {
     const response = await fetch(`${process.env.API_URL}/chatbot`, {
@@ -17,7 +17,6 @@ app.post("/api/chatbot", async (req, res) => {
       body: JSON.stringify({ message }),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.KEY_API}`,
       },
     });
     const data = await response.json();
