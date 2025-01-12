@@ -1,17 +1,67 @@
 import os
-from flask import Flask, jsonify, request, send_from_directory
-from flask_cors import CORS
+from werkzeug.utils import secure_filename
+from flask import Flask, jsonify, request
+from google.cloud import secretmanager
+import json
 from dotenv import load_dotenv
-import google.generativeai as genai
 import re
+import google.generativeai as genai
+from flask_cors import CORS
+
 
 app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
 
-key = os.getenv("KEY_API")
-genai.configure(api_key=key)
+
+def get_secret(secret_name, project_id=None):
+    client = secretmanager.SecretManagerServiceClient()
+    project_id = os.getenv('PROJECT_ID')
+    if not project_id:
+        raise ValueError("PROJECT_ID environment variable is not set.")
+    secret_version = f'projects/{project_id}/secrets/{secret_name}/versions/latest'
+    response = client.access_secret_version(name=secret_version)
+    return response.payload.data.decode('UTF-8')
+
+
+# Get credentials from Secret Manager
+credentials_json = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
+
+# Parse file JSON
+credentials = json.loads(credentials_json)
+
+# Configure Google Cloud Storage
+BUCKET_NAME = credentials['bucket_name']
+MODEL_PATH = credentials['model_path']
+
+# Configure Vertex AI
+PROJECT_ID = credentials['project_id']
+print(f"Project ID: {PROJECT_ID}")
+LOCATION = credentials['location']
+print(f"Location: {LOCATION}")
+MODEL_ID = credentials['model_id']
+print(f"Model ID: {MODEL_ID}")
+SYSTEM_INSTRUCTION = credentials['system_instruction']
+print(f"System Instruction: {SYSTEM_INSTRUCTION}")
+KEY_API = credentials['key_api']
+print(f"Key API: {KEY_API}")
+CHATBOT = credentials['chatbot']
+print(f"Chatbot: {CHATBOT}")
+
+
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({
+        "status": {
+            "code": 200,
+            "message": "Welcome to model api NV Bite🍃",
+        },
+        "data": None
+    }), 200
+
+
+genai.configure(api_key=KEY_API)
 
 # Create the model
 generation_config = {
@@ -25,7 +75,7 @@ generation_config = {
 model = genai.GenerativeModel(
     model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
-    system_instruction="### **Sistem Instruksi untuk Chatbot Airi**  \n**Tujuan:**  \nAiri adalah chatbot berbahasa Indonesia yang dirancang untuk membantu klien bernama **Rizky Yanuar Kristianto**, seorang mahasiswa S1 Data Science berusia 21 tahun yang berdomisili di **Surabaya**, menjawab pertanyaan terkait CV atau biodata klien.  \n**Tugas Utama Airi:**  \n1. Memberikan informasi yang lengkap dan relevan tentang Rizky Yanuar Kristianto berdasarkan data yang tersedia.  \n2. Menjawab pertanyaan dengan bahasa formal namun tetap ramah, jelas, dan mudah dipahami.  \n3. Memastikan jawaban mencakup detail yang penting dan terstruktur agar sesuai dengan kebutuhan pengguna yang bertanya.  \n**Profil Klien**  \n- Nama: Rizky Yanuar Kristianto  \n- Umur: 21 tahun  \n- Domisili: Surabaya  \n- Pendidikan: Mahasiswa S1 Data Science, Universitas Negeri Surabaya (IPK: 3,47/4,0).  \n**Deskripsi Profil:**  \nRizky adalah mahasiswa S1 Data Science dengan keterampilan analisis yang kuat, kemampuan pemecahan masalah berbasis data, dan pemikiran kritis. Ia berfokus pada penerapan pengetahuan akademik untuk menyelesaikan tantangan berbasis data dan memiliki antusiasme tinggi dalam berkontribusi pada proyek-proyek berdampak, sambil terus mengembangkan keahlian di bidang data science.\n**Pengalaman:**  \n1. **Ketua Penelitian**, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Negeri Surabaya:  \n   - Memimpin proyek penelitian bertema *Prediksi Depresi dari Data Ucapan*.  \n2. **Anggota Staf**, Divisi Advokasi dan Kesejahteraan Mahasiswa, Himpunan Mahasiswa Data Science, Universitas Negeri Surabaya:  \n   - Berpartisipasi aktif dalam inisiatif untuk mendukung kesejahteraan mahasiswa.  \n**Proyek:**  \n- **Prediksi Depresi dari Data Ucapan**  \n   - Mengembangkan model prediktif untuk mengidentifikasi indikator depresi dari data ucapan.  \n   - Mempresentasikan hasil penelitian pada simposium penelitian universitas.  \n- **Analisis Sentimen Penerima KIPK Berdasarkan Tweet di Platform X**  \n   - Menganalisis sentimen tweet terkait penerima KIPK menggunakan NLP.  \n   - Memvisualisasikan hasil untuk menyoroti temuan utama.  \n- **NV-Bite: Aplikasi Pelacak Jejak Karbon Makanan**  \n   - Membangun model pembelajaran mesin untuk pengenalan makanan dan estimasi jejak karbon.  \n   - Berkolaborasi dengan tim cloud dan mobile untuk mengintegrasikan model ke dalam aplikasi.  \n**Keahlian:**  \n- **Teknis:** Python, Tableau, Microsoft Office, Tensorflow.  \n- **Tambahan:** Data Mining, Deep Learning, Data Visualization, dan Manajemen Proyek.  \n**Cara Menjawab Pertanyaan:**  \n1. Dengarkan pertanyaan dengan saksama dan tanggapi dengan poin-poin yang relevan dari profil di atas.  \n2. jawab sesingkat dan ringkas mungkin tetapi masih komprehensif maks 3 kalimat \n3. Jika ada pertanyaan spesifik, seperti \"Apa saja proyek yang pernah dikerjakan Rizky?\" atau \"Apa keahlian teknis Rizky?\", langsung fokus pada bagian tersebut.  \n4. Akhiri jawaban dengan nada positif, misalnya dengan menekankan kemampuan atau potensi klien.  \n5. jawab jika hanya menanyakan tentang cv atau sejenis nya client kamu",
+    system_instruction=CHATBOT,
 )
 
 chat_session = model.start_chat(
@@ -82,13 +132,8 @@ chat_session = model.start_chat(
 )
 
 
-@app.route("/", methods=["GET"])
-def index():
-    return send_from_directory('templates', 'index.html')
-
-
-@app.route("/predict", methods=["POST"])
-def predict_text():
+@app.route("/chatbot", methods=["POST"])
+def predict_website():
     data = request.get_json()
     message = data.get('message')
     print(f"Message: {message}")
@@ -102,53 +147,33 @@ def predict_text():
         }), 400
 
     # Generate text using Vertex AI
-    answer = generate_text(message)
+    answer = chatbot(message)
     print(f"Generated Text: {answer}")
     message = {"answer": answer}
     return jsonify(message)
 
 
-# Fungsi untuk menghasilkan teks dan langsung mengonversinya ke HTML
-def generate_text(input_text):
-    # Mengirimkan pesan ke chat session dan mendapatkan generated_text
+def chatbot(input_text):
     response = chat_session.send_message(input_text)
-    generated_text = response.text  # Akses atribut text dari response
-
-    # Parsing # Heading 1, ## Heading 2, ### Heading 3
+    generated_text = response.text
     generated_text = re.sub(
         r'^(#{1})\s*(.*?)$', r'<h1>\2</h1>', generated_text, flags=re.MULTILINE)
     generated_text = re.sub(
         r'^(#{2})\s*(.*?)$', r'<h2>\2</h2>', generated_text, flags=re.MULTILINE)
     generated_text = re.sub(
         r'^(#{3})\s*(.*?)$', r'<h3>\2</h3>', generated_text, flags=re.MULTILINE)
-
-    # Parsing **Bold**
     generated_text = re.sub(
         r'\*\*(.*?)\*\*', r'<strong>\1</strong>', generated_text)
-
-    # Parsing *Italic*
     generated_text = re.sub(r'\*(.*?)\*', r'<em>\1</em>', generated_text)
-
-    # Parsing - or * for unordered lists
     generated_text = re.sub(
         r'^[\*\-]\s+(.*)$', r'<ul><li>\1</li></ul>', generated_text, flags=re.MULTILINE)
-
-    # Parsing for nested lists (indented lists)
     generated_text = re.sub(
         r'^\s{2,}[\*\-]\s+(.*)$', r'<ul><li>\1</li></ul>', generated_text, flags=re.MULTILINE)
-
-    # Parsing [Link](url) for hyperlinks
     generated_text = re.sub(r'\[(.*?)\]\((.*?)\)',
                             r'<a href="\2">\1</a>', generated_text)
-
-    # Parsing > Blockquotes
     generated_text = re.sub(
         r'^>\s*(.*)$', r'<blockquote>\1</blockquote>', generated_text, flags=re.MULTILINE)
-
-    # Parsing for paragraphs (handling new lines)
     generated_text = re.sub(r'(^|\n)([^\n]+)', r'<p>\2</p>', generated_text)
-
-    # Mengembalikan hasil dalam format HTML
     return generated_text
 
 
