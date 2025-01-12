@@ -31,23 +31,8 @@ credentials_json = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
 # Parse file JSON
 credentials = json.loads(credentials_json)
 
-# Configure Google Cloud Storage
-BUCKET_NAME = credentials['bucket_name']
-MODEL_PATH = credentials['model_path']
-
-# Configure Vertex AI
-PROJECT_ID = credentials['project_id']
-print(f"Project ID: {PROJECT_ID}")
-LOCATION = credentials['location']
-print(f"Location: {LOCATION}")
-MODEL_ID = credentials['model_id']
-print(f"Model ID: {MODEL_ID}")
-SYSTEM_INSTRUCTION = credentials['system_instruction']
-print(f"System Instruction: {SYSTEM_INSTRUCTION}")
 KEY_API = credentials['key_api']
-print(f"Key API: {KEY_API}")
 CHATBOT = credentials['chatbot']
-print(f"Chatbot: {CHATBOT}")
 
 
 @app.route("/", methods=["GET"])
