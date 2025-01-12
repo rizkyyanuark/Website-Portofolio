@@ -40,7 +40,7 @@ def index():
     return jsonify({
         "status": {
             "code": 200,
-            "message": "Welcome to model api NV Bite🍃",
+            "message": "Welcome to web chatbot API",
         },
         "data": None
     }), 200
