@@ -3,3 +3,6 @@ node_modules/
 chatbot
 .env
 __pycache__
+datadiri.json
+app2.py
+secret.json

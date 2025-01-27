@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import re
 import google.generativeai as genai
 from flask_cors import CORS
+import datetime
 
 
 app = Flask(__name__)
@@ -26,13 +27,14 @@ def get_secret(secret_name, project_id=None):
 
 
 # Get credentials from Secret Manager
-credentials_json = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
+# credentials_json = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
 
 # Parse file JSON
-credentials = json.loads(credentials_json)
+# credentials = json.loads("secret.json")
 
-KEY_API = credentials['key_api']
-CHATBOT = credentials['chatbot']
+KEY_API = os.getenv('KEY_API')
+# CHATBOT = credentials['chatbot']
+# MODEL = credentials['model_id']
 
 
 @app.route("/", methods=["GET"])
@@ -48,6 +50,19 @@ def index():
 
 genai.configure(api_key=KEY_API)
 
+
+def get_knowledge_base_content():
+    with open('datadiri.json', 'r') as file:
+        data = json.load(file)
+    return data
+
+
+knowledge_base_content = get_knowledge_base_content()
+
+# Dapatkan bulan dan tahun sekarang
+now = datetime.datetime.now()
+formatted_date = now.strftime("%B %Y")
+
 # Create the model
 generation_config = {
     "temperature": 1,
@@ -60,59 +75,24 @@ generation_config = {
 model = genai.GenerativeModel(
     model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
-    system_instruction=CHATBOT,
+    system_instruction=f"""
+            Anda adalah chatbot virtual assistant yang menggantikan Kiki untuk menjawab pertanyaan dari orang lain. 
+            Rizky lebih menyukai jawaban yang singkat, padat, jelas, namun tetap ramah. Berikut adalah beberapa aturan penting yang harus Anda ikuti:
+            
+            1. Jawablah berdasarkan informasi yang tersedia di knowledge base berikut:
+               \n\n{knowledge_base_content}
+            2. Jika tidak mengetahui jawaban, katakan dengan sopan: "Maaf, saya tidak tahu."
+            3. Jika pertanyaan bersifat terlalu pribadi, sensitif, atau toxic, balas dengan: "Maaf, saya tidak bisa menjawab pertanyaan seperti itu."
+            4. Semua jawaban harus dalam format markdown.
+    
+            Informasi tambahan untuk konteks waktu saat ini:
+            Tanggal: {formatted_date}
+            
+            Pastikan Anda menyapa pengguna dengan hangat di awal, memberikan jawaban yang membantu, dan menutup percakapan dengan ramah.
+        """,
 )
-
 chat_session = model.start_chat(
     history=[
-        {
-            "role": "user",
-            "parts": [
-                "berikan summary nya ",
-            ],
-        },
-        {
-            "role": "model",
-            "parts": [
-                "Tentu, berikut adalah ringkasan singkat tentang Rizky Yanuar Kristianto:\n\nRizky adalah seorang mahasiswa S1 Data Science berusia 21 tahun di Surabaya, dengan IPK 3,47. Ia memiliki pengalaman sebagai ketua penelitian dan anggota staf divisi advokasi mahasiswa. Rizky memiliki keahlian teknis dalam Python, Tableau, Microsoft Office, dan TensorFlow, serta keahlian tambahan di Data Mining, Deep Learning, Data Visualization, dan Manajemen Proyek. Ia juga memiliki beberapa proyek penting, termasuk prediksi depresi dari data ucapan, analisis sentimen penerima KIPK berdasarkan tweet, dan pengembangan aplikasi pelacak jejak karbon makanan NV-Bite. Rizky memiliki kemampuan analisis yang kuat dan antusiasme dalam bidang data science.\n",
-            ],
-        },
-        {
-            "role": "user",
-            "parts": [
-                "berikan project projectnya ",
-            ],
-        },
-        {
-            "role": "model",
-            "parts": [
-                "Rizky Yanuar Kristianto memiliki beberapa proyek penting, yaitu:\n1.  **Prediksi Depresi dari Data Ucapan**: Mengembangkan model prediktif untuk mengidentifikasi indikator depresi dari data ucapan, yang dipresentasikan pada simposium penelitian universitas.\n2.  **Analisis Sentimen Penerima KIPK Berdasarkan Tweet di Platform X**: Menganalisis sentimen tweet terkait penerima KIPK menggunakan NLP dan memvisualisasikan hasilnya.\n3.  **NV-Bite: Aplikasi Pelacak Jejak Karbon Makanan**: Membangun model pembelajaran mesin untuk pengenalan makanan dan estimasi jejak karbon, berkolaborasi dengan tim cloud dan mobile untuk integrasi aplikasi.\n",
-            ],
-        },
-        {
-            "role": "user",
-            "parts": [
-                "summary cvnya",
-            ],
-        },
-        {
-            "role": "model",
-            "parts": [
-                "Rizky Yanuar Kristianto adalah mahasiswa S1 Data Science di Surabaya dengan IPK 3,47, memiliki pengalaman sebagai ketua penelitian dan aktif dalam organisasi mahasiswa. Ia memiliki keahlian teknis seperti Python, Tableau, dan TensorFlow, serta keahlian tambahan dalam Data Mining dan Deep Learning. Rizky juga memiliki pengalaman proyek dalam analisis data dan pengembangan aplikasi, menunjukkan kemampuan analisis dan pemecahan masalah yang kuat.\n",
-            ],
-        },
-        {
-            "role": "user",
-            "parts": [
-                "berikan dalam perpoin",
-            ],
-        },
-        {
-            "role": "model",
-            "parts": [
-                "Baik, berikut adalah poin-poin ringkasan CV Rizky Yanuar Kristianto:\n\n*   **Identitas:**\n    *   Nama: Rizky Yanuar Kristianto\n    *   Usia: 21 tahun\n    *   Domisili: Surabaya\n    *   Pendidikan: Mahasiswa S1 Data Science, Universitas Negeri Surabaya (IPK: 3,47/4,0)\n*   **Pengalaman:**\n    *   Ketua Penelitian, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Negeri Surabaya\n    *   Anggota Staf, Divisi Advokasi dan Kesejahteraan Mahasiswa, Himpunan Mahasiswa Data Science, Universitas Negeri Surabaya\n*   **Proyek:**\n    *   Prediksi Depresi dari Data Ucapan\n    *   Analisis Sentimen Penerima KIPK Berdasarkan Tweet di Platform X\n    *   NV-Bite: Aplikasi Pelacak Jejak Karbon Makanan\n*   **Keahlian:**\n    *   Teknis: Python, Tableau, Microsoft Office, TensorFlow\n    *   Tambahan: Data Mining, Deep Learning, Data Visualization, Manajemen Proyek\n*   **Deskripsi Singkat:**\n    *   Mahasiswa S1 Data Science dengan keterampilan analisis yang kuat, kemampuan pemecahan masalah berbasis data, dan pemikiran kritis.\n    *   Berfokus pada penerapan pengetahuan akademik untuk menyelesaikan tantangan berbasis data.\n    *   Memiliki antusiasme tinggi dalam berkontribusi pada proyek-proyek berdampak, sambil terus mengembangkan keahlian di bidang data science.\n",
-            ],
-        },
     ]
 )
 
