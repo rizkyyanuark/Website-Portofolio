@@ -26,7 +26,7 @@ def get_secret(secret_name, project_id=None):
 
 
 # Get credentials from Secret Manager
-credentials_json = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
+credentials_json = get_secret("personal-data")
 
 # Parse file JSON
 credentials = json.loads(credentials_json)
