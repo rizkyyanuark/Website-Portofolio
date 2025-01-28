@@ -1,5 +1,4 @@
 import os
-from werkzeug.utils import secure_filename
 from flask import Flask, jsonify, request
 from google.cloud import secretmanager
 import json
@@ -27,14 +26,14 @@ def get_secret(secret_name, project_id=None):
 
 
 # Get credentials from Secret Manager
-# credentials_json = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
+credentials_json = get_secret("GOOGLE_APPLICATION_CREDENTIALS")
 
 # Parse file JSON
-# credentials = json.loads("secret.json")
+credentials = json.loads(credentials_json)
 
 KEY_API = os.getenv('KEY_API')
-# CHATBOT = credentials['chatbot']
-# MODEL = credentials['model_id']
+CHATBOT = credentials
+MODEL = os.getenv('MODEL')
 
 
 @app.route("/", methods=["GET"])
@@ -51,13 +50,7 @@ def index():
 genai.configure(api_key=KEY_API)
 
 
-def get_knowledge_base_content():
-    with open('datadiri.json', 'r') as file:
-        data = json.load(file)
-    return data
-
-
-knowledge_base_content = get_knowledge_base_content()
+knowledge_base_content = CHATBOT
 
 # Dapatkan bulan dan tahun sekarang
 now = datetime.datetime.now()
@@ -73,7 +66,7 @@ generation_config = {
 }
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp",
+    model_name=MODEL,
     generation_config=generation_config,
     system_instruction=f"""
             Anda adalah chatbot virtual assistant yang menggantikan Kiki untuk menjawab pertanyaan dari orang lain. 
