@@ -10,14 +10,8 @@ WORKDIR $APP_HOME
 # Copy the application code into the container
 COPY . ./
 
-# Copy the credentials file into the container
-COPY GOOGLE_APPLICATION_CREDENTIALS.json /app/GOOGLE_APPLICATION_CREDENTIALS.json
-
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Set the environment variable for Google Application Credentials
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/GOOGLE_APPLICATION_CREDENTIALS.json
 
 # Expose the port that the app runs on
 EXPOSE 8080

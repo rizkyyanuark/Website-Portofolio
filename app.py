@@ -26,14 +26,19 @@ def get_secret(secret_name, project_id=None):
 
 
 # Get credentials from Secret Manager
-credentials_json = get_secret("personal-data")
+credentials_json = get_secret("credentials")
+personal_data_json = get_secret("personal-data")
 
 # Parse file JSON
 credentials = json.loads(credentials_json)
+personal_data = json.loads(personal_data_json)
 
-KEY_API = os.getenv("KEY_API")
-CHATBOT = credentials
-MODEL = os.getenv("MODEL")
+KEY_API = credentials["KEY_API"]
+print(KEY_API)
+CHATBOT = personal_data
+print(CHATBOT)
+MODEL = credentials["MODEL"]
+print(MODEL)
 
 
 @app.route("/", methods=["GET"])

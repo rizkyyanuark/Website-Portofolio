@@ -3,7 +3,7 @@ node_modules/
 chatbot
 .env
 __pycache__
-datadiri.json
+personal-data.json
 app2.py
 secret.json
-GOOGLE_APPLICATION_CREDENTIALS.json
+credentials.json
