@@ -11,7 +11,21 @@ steps:
 
   # Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
-    args: ["run", "deploy", "chatbot-service", "--image", "asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service", "--platform", "managed", "--region", "asia-southeast2", "--allow-unauthenticated"]
+    args:
+      [
+        "run",
+        "deploy",
+        "chatbot-service",
+        "--image",
+        "asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service",
+        "--platform",
+        "managed",
+        "--region",
+        "asia-southeast2",
+        "--allow-unauthenticated",
+        "--add-header",
+        "Access-Control-Allow-Origin=*",
+      ]
 
 options:
   logging: CLOUD_LOGGING_ONLY

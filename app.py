@@ -10,8 +10,7 @@ import datetime
 
 
 app = Flask(__name__)
-CORS(app, resources={
-     r"/chatbot": {"origins": "https://rizkyyanuark.vercel.app"}})
+CORS(app)
 
 load_dotenv()
 
@@ -98,6 +97,14 @@ chat_session = model.start_chat(
 
 @app.route("/chatbot", methods=["POST"])
 def predict_website():
+    if request.method == "OPTIONS":
+        response = jsonify({"message": "CORS preflight successful"})
+        response.headers.add("Access-Control-Allow-Origin",
+                             "https://rizkyyanuark.vercel.app")
+        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+        response.headers.add("Access-Control-Allow-Headers",
+                             "Content-Type, Authorization")
+        return response, 200
     data = request.get_json()
     message = data.get('message')
     print(f"Message: {message}")
@@ -113,8 +120,10 @@ def predict_website():
     # Generate text using Vertex AI
     answer = chatbot(message)
     print(f"Generated Text: {answer}")
-    message = {"answer": answer}
-    return jsonify(message)
+    response = jsonify({"answer": answer})
+    response.headers.add("Access-Control-Allow-Origin",
+                         "https://rizkyyanuark.vercel.app")
+    return jsonify(response), 200
 
 
 def chatbot(input_text):
