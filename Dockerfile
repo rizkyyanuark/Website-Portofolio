@@ -1,18 +1,21 @@
-# Use the appropriate base image
-FROM python:3.10-slim
+# Gunakan image Python sebagai dasar
+FROM python:3.9
 
-ENV PYTHONUNBUFFERED True
-ENV APP_HOME /app
+# Set direktori kerja di dalam container
+WORKDIR /app
 
-# Set the working directory
-WORKDIR $APP_HOME
-
-# Copy the application code into the container
-COPY . ./
+# Copy semua file ke dalam container
+COPY . .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Expose port 8080 untuk Cloud Run
 EXPOSE 8080
 
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
+# Set environment variable untuk Flask
+ENV PORT=8080
+ENV PYTHONUNBUFFERED=1
+
+# Jalankan aplikasi Flask
+CMD ["python", "app.py"]
