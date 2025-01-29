@@ -17,7 +17,7 @@ load_dotenv()
 
 def get_secret(secret_name, project_id=None):
     client = secretmanager.SecretManagerServiceClient()
-    project_id = os.getenv('PROJECT_ID')
+    project_id = "website-portfolio-kiki"
     if not project_id:
         raise ValueError("PROJECT_ID environment variable is not set.")
     secret_version = f'projects/{project_id}/secrets/{secret_name}/versions/latest'
@@ -136,4 +136,5 @@ def chatbot(input_text):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
