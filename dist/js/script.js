@@ -68,7 +68,7 @@ class Chatbox {
     this.messages.push(thinkingMsg);
     this.updateChatText(chatbox);
 
-    fetch("/api/chatbot", {
+    fetch("https://chatbot-service-333251236087.asia-southeast2.run.app", {
       method: "POST",
       body: JSON.stringify({ message: text1 }),
       headers: {
