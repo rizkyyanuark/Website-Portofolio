@@ -13,8 +13,5 @@ COPY . ./
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port that the app runs on
-EXPOSE 8080
-
 # Run the application using gunicorn
 CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app

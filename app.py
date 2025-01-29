@@ -31,9 +31,9 @@ credentials_json = get_secret("personal-data")
 # Parse file JSON
 credentials = json.loads(credentials_json)
 
-KEY_API = os.getenv('KEY_API')
+KEY_API = os.getenv("KEY_API")
 CHATBOT = credentials
-MODEL = os.getenv('MODEL')
+MODEL = os.getenv("MODEL")
 
 
 @app.route("/", methods=["GET"])
@@ -136,5 +136,4 @@ def chatbot(input_text):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
