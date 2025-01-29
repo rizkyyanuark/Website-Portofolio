@@ -1,21 +1,27 @@
-# Gunakan image Python sebagai dasar
-FROM python:3.9
+# Use the appropriate base image
+FROM python:3.10-slim
 
-# Set direktori kerja di dalam container
-WORKDIR /app
+ENV PYTHONUNBUFFERED True
+ENV APP_HOME /app
 
-# Copy semua file ke dalam container
-COPY . .
+# Set the working directory
+WORKDIR $APP_HOME
+
+# Copy the application code into the container
+COPY . ./
+
+# Copy the credentials file into the container
+COPY GOOGLE_APPLICATION_CREDENTIALS.json /app/GOOGLE_APPLICATION_CREDENTIALS.json
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 8080 untuk Cloud Run
+# Set the environment variable for Google Application Credentials
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/GOOGLE_APPLICATION_CREDENTIALS.json
+
+# Expose the port that the app runs on
 EXPOSE 8080
-
-# Set environment variable untuk Flask
 ENV PORT=8080
-ENV PYTHONUNBUFFERED=1
 
-# Jalankan aplikasi Flask
-CMD ["python", "app.py"]
+# Run the application using gunicorn
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
