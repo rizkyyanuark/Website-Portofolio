@@ -10,7 +10,8 @@ import datetime
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+     r"/chatbot": {"origins": "https://rizkyyanuark.vercel.app"}})
 
 load_dotenv()
 
