@@ -34,11 +34,8 @@ credentials = json.loads(credentials_json)
 personal_data = json.loads(personal_data_json)
 
 KEY_API = credentials["KEY_API"]
-print(KEY_API)
 CHATBOT = personal_data
-print(CHATBOT)
 MODEL = credentials["MODEL"]
-print(MODEL)
 
 
 @app.route("/", methods=["GET"])
@@ -97,14 +94,6 @@ chat_session = model.start_chat(
 
 @app.route("/chatbot", methods=["POST"])
 def predict_website():
-    if request.method == "OPTIONS":
-        response = jsonify({"message": "CORS preflight successful"})
-        response.headers.add("Access-Control-Allow-Origin",
-                             "https://rizkyyanuark.vercel.app")
-        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
-        response.headers.add("Access-Control-Allow-Headers",
-                             "Content-Type, Authorization")
-        return response, 200
     data = request.get_json()
     message = data.get('message')
     print(f"Message: {message}")
@@ -120,10 +109,8 @@ def predict_website():
     # Generate text using Vertex AI
     answer = chatbot(message)
     print(f"Generated Text: {answer}")
-    response = jsonify({"answer": answer})
-    response.headers.add("Access-Control-Allow-Origin",
-                         "https://rizkyyanuark.vercel.app")
-    return jsonify(response), 200
+    message = {"answer": answer}
+    return jsonify(message)
 
 
 def chatbot(input_text):
