@@ -27,7 +27,7 @@ steps:
         "--cpu",
         "1", # Set CPU
         "--set-env-vars",
-        "PROJECT_ID=${PROJECT_ID},KEY_API=${KEY_API}", # Set environment variables
+        "PROJECT_ID=${PROJECT_ID}, # Set environment variables
         "--max-instances",
         "5", # Set maximum instances
         "--min-instances",
