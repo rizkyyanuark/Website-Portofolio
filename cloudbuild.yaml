@@ -1,13 +1,20 @@
 steps:
   # Build Docker image
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service", "."]
+    args:
+      - "build"
+      - "--cache-from=asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service:latest"
+      - "-t"
+      - "asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service:${SHORT_SHA}"
+      - "."
     env:
       - "DOCKER_BUILDKIT=1"
 
   # Push Docker image
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service"]
+    args:
+      - "push"
+      - "asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service:${SHORT_SHA}"
 
   # Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
@@ -15,18 +22,19 @@ steps:
       - "run"
       - "deploy"
       - "chatbot-service"
-      - "--image=asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service"
+      - "--image=asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service:${SHORT_SHA}"
       - "--platform=managed"
       - "--region=asia-southeast2"
       - "--allow-unauthenticated"
       - "--memory=2Gi"
       - "--cpu=2"
+      - "--no-cpu-throttling"
       - "--concurrency=10"
-      - "--max-instances=5"
-      - "--min-instances=1"
+      - "--max-instances=10"
+      - "--min-instances=0"
       - "--timeout=300"
       - "--update-env-vars=PROJECT_ID=${PROJECT_ID}"
-      - "--service-account=${PROJECT_ID}@appspot.gserviceaccount.com"
+      - "--service-account=${PROJECT_ID}-sa@${PROJECT_ID}.iam.gserviceaccount.com"
       - "--quiet"
 
 options:
