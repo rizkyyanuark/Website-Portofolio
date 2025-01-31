@@ -11,7 +11,30 @@ steps:
 
   # Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
-    args: ["run", "deploy", "chatbot-service", "--image", "asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service", "--platform", "managed", "--region", "asia-southeast2", "--allow-unauthenticated"]
+    args: [
+        "run",
+        "deploy",
+        "chatbot-service",
+        "--image",
+        "asia-southeast2-docker.pkg.dev/${PROJECT_ID}/website-porto/chatbot-service",
+        "--platform",
+        "managed",
+        "--region",
+        "asia-southeast2",
+        "--allow-unauthenticated",
+        "--memory",
+        "512Mi", # Set memory
+        "--cpu",
+        "1", # Set CPU
+        "--set-env-vars",
+        "PROJECT_ID=${PROJECT_ID},KEY_API=${KEY_API}", # Set environment variables
+        "--max-instances",
+        "5", # Set maximum instances
+        "--min-instances",
+        "1", # Set minimum instances
+        "--timeout",
+        "300s", # Set request timeout
+      ]
 
 options:
   logging: CLOUD_LOGGING_ONLY
